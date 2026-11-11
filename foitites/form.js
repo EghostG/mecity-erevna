@@ -5,12 +5,10 @@
   var FUT = function(a){ return a.living==="parents"||a.living==="dorm"; };
   var YNM = [["yes","Ναι"],["maybe","Ίσως"],["no","Όχι"]];
   var STEPS = [
-    {key:"_intro", type:"say", step:"MeCity AI", title:"Πώς ψάχνουν σπίτι οι φοιτητές;",
+    {key:"_intro", type:"say", step:"MeCity AI", title:"Πώς ψάχνουν σπίτι οι φοιτητές στην Αθήνα;",
       say:"Ανώνυμη έρευνα 1 λεπτού. Δεν ζητάμε κανένα προσωπικό στοιχείο.", btn:"Ξεκίνα"},
     {key:"living", title:"Πού μένεις τώρα;",
       opts:[["rent_alone","Νοικιάζω μόνος/η"],["rent_shared","Νοικιάζω με συγκάτοικο"],["parents","Με τους γονείς μου"],["dorm","Σε εστία"]]},
-    {key:"city", title:"Σε ποια πόλη σπουδάζεις;",
-      opts:[["athens","Αθήνα"],["thessaloniki","Θεσσαλονίκη"],["patra","Πάτρα"],["heraklion","Ηράκλειο"],["other","Άλλη"]]},
     {key:"sources", type:"multi",
       title:function(a){ return FUT(a)?"Πού θα έψαχνες σπίτι;":"Πού έψαξες σπίτι;"; },
       hint:"Διάλεξε όσα ισχύουν.",
@@ -30,7 +28,7 @@
     {key:"use", title:"Θα το χρησιμοποιούσες την επόμενη φορά που ψάχνεις σπίτι;", opts:YNM},
     {key:"trust", title:"Θα εμπιστευόσουν AI να σου πει αν ένα ενοίκιο είναι δίκαιο;", opts:YNM}
   ];
-  var KEYS = ["living","city","sources","pain","scam","price","ai","budget","use","trust"];
+  var KEYS = ["living","sources","pain","scam","price","ai","budget","use","trust"];
   var $ = function(id){return document.getElementById(id);};
   var ans={}, i=0;
   var LS="mecity_foitites_pending_v1";

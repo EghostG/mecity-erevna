@@ -2,7 +2,7 @@
 (function(){
   "use strict";
   var C=window.MECITY, $=function(id){return document.getElementById(id);};
-  var rows=[], city="all";
+  var rows=[];
   var L={
     living:{rent_alone:"Νοικιάζει μόνος/η",rent_shared:"Νοικιάζει με συγκάτοικο",parents:"Με τους γονείς",dorm:"Εστία"},
     city:{athens:"Αθήνα",thessaloniki:"Θεσσαλονίκη",patra:"Πάτρα",heraklion:"Ηράκλειο",other:"Άλλη"},
@@ -22,7 +22,7 @@
   function dist(list,key,map){ var h=""; Object.keys(map).forEach(function(k){ h+=bar(map[k],cnt(list,key,k),list.length); }); return h; }
 
   function render(){
-    var all = city==="all" ? rows : rows.filter(function(r){return r.city===city;});
+    var all = rows;
     var n=all.length, el=$("res");
     $("count").textContent=rows.length;
     if(!n){ el.innerHTML='<div class="card"><h2>Καμία απάντηση ακόμα</h2><p class="note">Μόλις συμπληρώσει κάποιος τη φόρμα, εμφανίζεται εδώ.</p></div>'; return; }
@@ -40,17 +40,16 @@
     var ub=""; Object.keys(L.budget).forEach(function(k){ var G=U.filter(function(r){return r.budget===k;}); ub+=bar(L.budget[k],cnt(G,"use","yes"),G.length); });
     h+=card("«Θα το χρησιμοποιούσα» ανά budget",ub);
     h+=card("Πού μένουν",dist(all,"living",L.living));
-    if(city==="all") h+=card("Πόλη",dist(all,"city",L.city));
     var q=all.filter(function(r){return r.pain;}).sort(function(a,b){return (b.ts||"").localeCompare(a.ts||"");});
     var qs=q.length?"":'<p class="note">Καμία ακόμα.</p>';
-    q.forEach(function(r){ qs+='<div class="quote">'+esc(r.pain)+'<small>'+esc(L.living[r.living]||"")+(r.city?' · '+esc(L.city[r.city]||r.city):'')+(r.budget?' · '+esc(L.budget[r.budget]||r.budget):'')+'</small></div>'; });
+    q.forEach(function(r){ qs+='<div class="quote">'+esc(r.pain)+'<small>'+esc(L.living[r.living]||"")+(r.budget?' · '+esc(L.budget[r.budget]||r.budget):'')+'</small></div>'; });
     h+=card("Τι τους δυσκολεύει ("+q.length+")",qs);
-    h+=card("Εξαγωγή",'<p class="note">Αντιγράφει τις απαντήσεις (με το φίλτρο πόλης) για Excel ή Sheets.</p><div class="row"><button class="opt" id="copy" type="button">Αντιγραφή πίνακα</button></div><p class="note" id="copy-msg"></p><textarea id="csv" hidden readonly aria-label="Πίνακας"></textarea>');
+    h+=card("Εξαγωγή",'<p class="note">Αντιγράφει τις απαντήσεις για Excel ή Sheets.</p><div class="row"><button class="opt" id="copy" type="button">Αντιγραφή πίνακα</button></div><p class="note" id="copy-msg"></p><textarea id="csv" hidden readonly aria-label="Πίνακας"></textarea>');
     el.innerHTML=h;
     $("copy").addEventListener("click",function(){ copy(all); });
   }
   function copy(list){
-    var cols=[["ts","Ώρα"],["living","Μένει"],["city","Πόλη"],["sources","Πού ψάχνει"],["pain","Δυσκολία"],["scam","Αγγελία ≠ πραγματικότητα"],["price","Ήξερε αν το ενοίκιο είναι λογικό"],["ai","Ρώτησε AI"],["budget","Budget"],["use","Θα το χρησιμοποιούσε"],["trust","Εμπιστεύεται AI"]];
+    var cols=[["ts","Ώρα"],["living","Μένει"],["sources","Πού ψάχνει"],["pain","Δυσκολία"],["scam","Αγγελία ≠ πραγματικότητα"],["price","Ήξερε αν το ενοίκιο είναι λογικό"],["ai","Ρώτησε AI"],["budget","Budget"],["use","Θα το χρησιμοποιούσε"],["trust","Εμπιστεύεται AI"]];
     var fmt=function(k,v){ if(v==null) return ""; if(k==="sources") return v.split(",").map(function(s){return L.sources[s]||s;}).join(", ");
       if(L[k]&&L[k][v]) return L[k][v]; if((k==="ai"||k==="use"||k==="trust")&&L.yn[v]) return L.yn[v]; return v; };
     var lines=[cols.map(function(c){return c[1];}).join("\t")];
@@ -65,6 +64,5 @@
       .then(function(d){ rows=d||[]; $("sync").textContent="✓ Ενημερωμένα"; $("sync").className=""; render(); })
       .catch(function(){ $("sync").textContent="Χωρίς σύνδεση"; $("sync").className="warn"; });
   }
-  $("city").addEventListener("change",function(e){ city=e.target.value; render(); });
   load(); setInterval(function(){ if(!document.hidden) load(); },20000);
 })();
