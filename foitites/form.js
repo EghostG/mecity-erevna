@@ -30,7 +30,7 @@
   ];
   var KEYS = ["living","sources","pain","scam","price","ai","budget","use","trust"];
   var $ = function(id){return document.getElementById(id);};
-  var ans={}, i=0;
+  var ans={}, i=0, lastId=null;
   var LS="mecity_foitites_pending_v1";
   function loadP(){ try{ return JSON.parse(localStorage.getItem(LS)||"[]"); }catch(e){ return []; } }
   function saveP(p){ try{ localStorage.setItem(LS, JSON.stringify(p)); }catch(e){} }
@@ -80,7 +80,7 @@
     var rec={id:"s"+Date.now().toString(36)+Math.random().toString(36).slice(2,7), ts:new Date().toISOString()};
     KEYS.forEach(function(k){ rec[k] = (ans[k]===undefined||ans[k]==="") ? null : ans[k]; });
     if(FUT(ans)){ rec.scam=null; rec.price=null; }
-    pending.push(rec); saveP(pending);
+    pending.push(rec); saveP(pending); lastId=rec.id;
     $("prog").style.width="100%"; $("step").textContent=""; $("title").textContent="Ευχαριστούμε!"; $("hint").hidden=true;
     $("body").innerHTML='<div class="done"><div class="ok">✓ Η απάντησή σου καταχωρήθηκε</div><div class="where" id="where">Αποθηκεύεται…</div></div>'
       +'<p class="note" style="margin-top:14px">Το MeCity AI βγαίνει σύντομα. Αν σου άρεσε η ιδέα, στείλε την έρευνα σε έναν συμφοιτητή σου.</p>';
@@ -94,7 +94,8 @@
     (function step(){
       if(!queue.length){
         busy=false;
-        if($("where")) $("where").textContent = pending.length
+        var mine = pending.some(function(p){return p.id===lastId;});
+        if($("where")) $("where").textContent = mine
           ? "Δεν υπάρχει σύνδεση. Άφησε τη σελίδα ανοιχτή, θα σταλεί μόλις βρει ίντερνετ."
           : "Αποθηκεύτηκε. Μπορείς να κλείσεις τη σελίδα.";
         if(pending.length) setTimeout(flush,8000);
