@@ -250,7 +250,9 @@ var TABLE = "responses";
     if(!configured || flushing || !pending.length) return;
     flushing=true;
     var batch = pending.slice();
-    api(TABLE+"?on_conflict=id", {method:"POST", body:batch, prefer:"resolution=ignore-duplicates,return=minimal"}).then(function(){
+    /* Όλες οι γραμμές πρέπει να έχουν τα ίδια πεδία, αλλιώς η βάση απορρίπτει όλο το πακέτο */
+    var body = batch.map(function(b){ var o={id:b.id, ts:b.ts}; KEYS.forEach(function(k){ o[k] = (b[k]===undefined||b[k]==="") ? null : b[k]; }); return o; });
+    api(TABLE+"?on_conflict=id", {method:"POST", body:body, prefer:"resolution=ignore-duplicates,return=minimal"}).then(function(){
       var sent={}; batch.forEach(function(b){ sent[b.id]=1; });
       batch.forEach(function(b){ if(!rows.some(function(r){return r.id===b.id;})) rows.push(b); });
       pending = pending.filter(function(p){ return !sent[p.id]; }); savePending(pending);
