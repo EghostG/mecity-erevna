@@ -90,19 +90,24 @@
   var busy=false;
   function flush(){
     if(busy||!pending.length) return; busy=true;
-    var batch=pending.slice();
-    fetch(C.url+"/rest/v1/students?on_conflict=id",{method:"POST",
-      headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json","Prefer":"resolution=ignore-duplicates,return=minimal"},
-      body:JSON.stringify(batch)}).then(function(r){
-        if(!r.ok) throw new Error(r.status);
-        var sent={}; batch.forEach(function(b){sent[b.id]=1;});
-        pending=pending.filter(function(p){return !sent[p.id];}); saveP(pending); busy=false;
-        if($("where")) $("where").textContent="Αποθηκεύτηκε. Μπορείς να κλείσεις τη σελίδα.";
-      }).catch(function(){
+    var queue=pending.slice(), fail=false;
+    (function step(){
+      if(!queue.length){
         busy=false;
-        if($("where")) $("where").textContent="Δεν υπάρχει σύνδεση. Άφησε τη σελίδα ανοιχτή, θα σταλεί μόλις βρει ίντερνετ.";
-        setTimeout(flush,8000);
-      });
+        if($("where")) $("where").textContent = pending.length
+          ? "Δεν υπάρχει σύνδεση. Άφησε τη σελίδα ανοιχτή, θα σταλεί μόλις βρει ίντερνετ."
+          : "Αποθηκεύτηκε. Μπορείς να κλείσεις τη σελίδα.";
+        if(pending.length) setTimeout(flush,8000);
+        return;
+      }
+      var rec=queue.shift();
+      fetch(C.url+"/rest/v1/students?on_conflict=id",{method:"POST", keepalive:true,
+        headers:{"apikey":C.key,"Authorization":"Bearer "+C.key,"Content-Type":"application/json","Prefer":"resolution=ignore-duplicates,return=minimal"},
+        body:JSON.stringify([rec])}).then(function(r){
+          if(r.ok){ pending=pending.filter(function(p){return p.id!==rec.id;}); saveP(pending); }
+          step();
+        }, function(){ step(); });
+    })();
   }
   $("back").addEventListener("click",prev);
   $("cancel").addEventListener("click",function(){ ans={}; i=0; render(); });

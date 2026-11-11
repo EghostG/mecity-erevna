@@ -246,24 +246,30 @@ var TABLE = "responses";
       .then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error(r.status+" "+t); }); return r.status===204?null:r.json(); });
   }
   var flushing=false;
+  function norm(b){ var o={id:b.id, ts:b.ts}; KEYS.forEach(function(k){ o[k] = (b[k]===undefined||b[k]==="") ? null : b[k]; }); return o; }
   function flush(){
     if(!configured || flushing || !pending.length) return;
     flushing=true;
-    var batch = pending.slice();
-    /* Όλες οι γραμμές πρέπει να έχουν τα ίδια πεδία, αλλιώς η βάση απορρίπτει όλο το πακέτο */
-    var body = batch.map(function(b){ var o={id:b.id, ts:b.ts}; KEYS.forEach(function(k){ o[k] = (b[k]===undefined||b[k]==="") ? null : b[k]; }); return o; });
-    api(TABLE+"?on_conflict=id", {method:"POST", body:body, prefer:"resolution=ignore-duplicates,return=minimal"}).then(function(){
-      var sent={}; batch.forEach(function(b){ sent[b.id]=1; });
-      batch.forEach(function(b){ if(!rows.some(function(r){return r.id===b.id;})) rows.push(b); });
-      pending = pending.filter(function(p){ return !sent[p.id]; }); savePending(pending);
-      flushing=false; dbState="ok"; setStatus();
-      if(lastSaved) renderDone();
-      if(!$("view-res").hidden) renderResults();
-      if(pending.length) flush();
-    }).catch(function(){
-      flushing=false; dbState="off"; setStatus(); if(lastSaved) renderDone();
-      setTimeout(flush, 10000);
-    });
+    var queue = pending.slice(), okAny=false, failNet=false;
+    (function step(){
+      if(!queue.length){
+        flushing=false; if(okAny||!failNet) dbState = failNet ? "off" : "ok"; else dbState="off";
+        setStatus(); if(lastSaved) renderDone(); if(!$("view-res").hidden) renderResults();
+        if(pending.length) setTimeout(flush, 10000);
+        return;
+      }
+      var rec = queue.shift();
+      fetch(SUPABASE_URL.replace(/\/$/,"")+"/rest/v1/"+TABLE+"?on_conflict=id", {method:"POST", keepalive:true,
+        headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json","Prefer":"resolution=ignore-duplicates,return=minimal"},
+        body:JSON.stringify([norm(rec)])}).then(function(r){
+          if(r.ok){
+            okAny=true;
+            if(!rows.some(function(x){return x.id===rec.id;})) rows.push(rec);
+            pending = pending.filter(function(p){ return p.id!==rec.id; }); savePending(pending);
+          } else { failNet=true; }
+          step();
+        }, function(){ failNet=true; step(); });
+    })();
   }
   var loading=false;
   function load(){
