@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#13263a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MeCity Έρευνα">
+<meta name="robots" content="noindex">
+<title>Ρωτήσαμε την Ερμού · MeCity AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f9; --surface:#ffffff; --ink:#13263a; --muted:#5d6b7b; --line:#d9e0e8;
+  --accent:#1f4e8c; --accent-ink:#ffffff; --good:#1d7a4f; --bad:#b3372f; --soft:#e6eef8;
+  --font: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0c1622; --surface:#13263a; --ink:#eef3f8; --muted:#9fb0c2; --line:#2a3f56;
+    --accent:#8fc1f0; --accent-ink:#0c1622; --good:#6fd3a1; --bad:#f08a80; --soft:#1b3550;
+    color-scheme: dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.4;-webkit-text-size-adjust:100%}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:12px 16px 20px;gap:12px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:800;font-size:15px;letter-spacing:.01em}
+.brand span{color:var(--muted);font-weight:500}
+.tabs{display:flex;gap:6px}
+.tab{font:inherit;font-size:14px;font-weight:700;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.status{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.status b{color:var(--ink)}
+.warn{color:var(--bad)}
+.progress{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+.q{flex:1;display:flex;flex-direction:column;gap:14px}
+.step{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+h1{font-size:25px;line-height:1.2;font-weight:800;margin:0;text-wrap:balance}
+.hint{font-size:14px;color:var(--muted);margin:0}
+.say{background:var(--soft);border-radius:14px;padding:16px;font-size:19px;font-weight:700;line-height:1.35}
+.opts{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.opt{font:inherit;font-size:19px;font-weight:700;text-align:left;padding:18px 16px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:62px}
+.opt:active,.opt.on{border-color:var(--accent);background:var(--soft)}
+.opt.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);text-align:center}
+.row{display:flex;gap:10px}
+.row .opt{flex:1;text-align:center}
+textarea{font:inherit;width:100%;min-height:120px;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);resize:vertical}
+textarea:focus,.opt:focus-visible,.tab:focus-visible,.link:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.nav{display:flex;justify-content:space-between;align-items:center}
+.link{font:inherit;font-size:15px;font-weight:700;background:none;border:0;color:var(--muted);padding:10px 4px;cursor:pointer}
+.link.danger{color:var(--bad)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.big{font-size:44px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi .lbl{font-size:13px;color:var(--muted);margin-top:6px}
+.kpi .sub{font-size:13px;color:var(--muted)}
+h2{font-size:15px;font-weight:800;margin:6px 0 0}
+.bar{margin-top:8px}
+.bar .t{display:flex;justify-content:space-between;font-size:14px;gap:8px}
+.bar .t span:last-child{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.bar .b{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:4px}
+.bar .b i{display:block;height:100%;background:var(--accent)}
+.quote{border-top:1px solid var(--line);padding:10px 0;font-size:15px}
+.quote:first-child{border-top:0}
+.quote small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.pill{display:inline-block;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--soft);color:var(--accent);margin-left:6px}
+.note{font-size:13px;color:var(--muted)}
+.done{background:var(--good);color:#fff;border-radius:14px;padding:18px 16px}
+.done.off{background:var(--bad)}
+.done .ok{font-size:26px;font-weight:800;line-height:1.15}
+.done .where{font-size:14px;margin-top:6px;opacity:.95}
+.recap{margin:0;padding:0;list-style:none}
+.recap li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.recap li:first-child{border-top:0}
+.recap li span:first-child{color:var(--muted)}
+.recap li span:last-child{font-weight:700;text-align:right}
+.entry{border-top:1px solid var(--line);padding:10px 0;font-size:14px}
+.entry:first-child{border-top:0}
+.entry b{font-size:15px}
+.entry .tags{color:var(--muted);margin-top:2px}
+.opt.ghost{background:transparent;text-align:center;font-size:16px;min-height:52px;padding:12px}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion: reduce){.progress i{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">MeCity AI <span>· Ερμού</span></div>
+    <div class="tabs" role="tablist">
+      <button class="tab" id="tab-ask" role="tab" aria-selected="true">Συνέντευξη</button>
+      <button class="tab" id="tab-res" role="tab" aria-selected="false">Αποτελέσματα</button>
+    </div>
+  </header>
+  <div class="status"><span>Συνεντεύξεις: <b id="count">0</b></span><span id="sync"></span></div>
+
+  <main id="view-ask" class="q">
+    <div class="progress"><i id="prog"></i></div>
+    <div class="step" id="step"></div>
+    <h1 id="title"></h1>
+    <p class="hint" id="hint"></p>
+    <div id="body"></div>
+    <div class="opts" id="opts"></div>
+    <div class="nav">
+      <button class="link" id="back">‹ Πίσω</button>
+      <button class="link danger" id="cancel">Ακύρωση</button>
+    </div>
+  </main>
+
+  <main id="view-res" hidden>
+    <div id="res"></div>
+  </main>
+</div>
+
+<script>
+/* ===== Ρυθμίσεις βάσης (Supabase) ===== */
+var SUPABASE_URL = "https://hbgyrljzrlyuqqufqrej.supabase.co";
+var SUPABASE_KEY = "sb_publishable_wdu4Eua-Lg98iYY2FEkP0w_oLAv6Ipn";
+var TABLE = "responses";
+
+(function(){
+  "use strict";
+  var YNM = [["yes","Ναι"],["no","Όχι"],["maybe","Ίσως / Δεν ξέρω"]];
+  var YN  = [["yes","Ναι"],["no","Όχι"]];
+  var STEPS = [
+    {key:"seg", title:"Έχεις ψάξει ποτέ σπίτι ή θα ψάξεις κάποια στιγμή;",
+      opts:[["now","Ψάχνει τώρα"],["past","Έχει ψάξει"],["future","Θα ψάξει"],["never","Ούτε έψαξε ούτε θα ψάξει"]]},
+    {key:"pain", type:"text",
+      title:function(a){return (a.seg==="future"||a.seg==="never")?"Τι φοβάσαι πιο πολύ για όταν θα ψάξεις;":"Τι σε έσπασε πιο πολύ όταν έψαχνες;";},
+      hint:"Γράψε την ατάκα με δυο λόγια. Μπορείς να την προσπεράσεις."},
+    {key:"price", title:"Την τελευταία φορά που πήρες τηλέφωνο για μια αγγελία, ήξερες αν η τιμή ήταν λογική;",
+      skip:function(a){return a.seg==="future"||a.seg==="never";},
+      opts:[["yes","Ναι, ήξερε"],["no","Όχι, δεν ήξερε"],["nocall","Δεν έχει πάρει ποτέ τηλέφωνο"]]},
+    {key:"ai", title:"Έχεις ρωτήσει ποτέ ChatGPT ή άλλο AI κάτι για σπίτι, ενοίκιο ή αγορά;", opts:YN},
+    {key:"_pitch", type:"say", title:"Πες τώρα τι φτιάχνουμε",
+      say:"«Φτιάχνουμε ένα AI που του γράφεις με δικά σου λόγια τι σπίτι θες, σου βγάζει μόνο όσα ταιριάζουν και σου λέει αν η τιμή είναι δίκαιη.»"},
+    {key:"use", title:"Όταν έρθει η ώρα να ψάξεις σπίτι, θα το χρησιμοποιούσες;", opts:YNM},
+    {key:"trust", title:"Θα εμπιστευόσουν AI να σου πει αν ένα σπίτι αξίζει τα λεφτά του;", opts:YNM},
+    {key:"agent", title:"Αν το AI σου έβγαζε ένα σπίτι που σου ταιριάζει, θα ήθελες να στο δείξει και να στο επιβεβαιώσει μεσίτης;", opts:YNM},
+    {key:"age", title:"Σε ποια ηλικία είσαι;", opts:[["18-24","18-24"],["25-34","25-34"],["35-44","35-44"],["45+","45 και πάνω"]]},
+    {key:"video", title:"Αξίζει η απάντηση για βίντεο;", hint:"Αυτό το σημειώνεις εσύ, δεν το ρωτάς.", opts:[["yes","Ναι, καλή για Reel"],["no","Όχι"]]}
+  ];
+  var KEYS = ["seg","pain","price","ai","use","trust","agent","age","video"];
+  var LABEL = {seg:{now:"Ψάχνει τώρα",past:"Έχει ψάξει",future:"Θα ψάξει",never:"Καμία σχέση"}};
+  var VAL = {yes:"Ναι",no:"Όχι",maybe:"Ίσως",nocall:"Δεν έχει πάρει τηλέφωνο"};
+  var FIELDS = [["seg","Σπίτι"],["pain","Ατάκα"],["price","Ήξερε αν η τιμή στέκει"],["ai","Έχει ρωτήσει AI"],["use","Θα το χρησιμοποιούσε"],["trust","Εμπιστεύεται AI"],["agent","Θέλει και μεσίτη"],["age","Ηλικία"],["video","Για Reel"]];
+  function show1(k,v){ if(v===undefined||v===null||v==="") return "—"; if(k==="seg") return LABEL.seg[v]||v; if(k==="pain"||k==="age") return v; return VAL[v]||v; }
+
+  var $ = function(id){return document.getElementById(id);};
+  var ans = {}, i = 0, rows = [], dbState = "wait";
+  var LS = "mecity_erevna_pending_v1";
+
+  function loadPending(){ try{ return JSON.parse(localStorage.getItem(LS)||"[]"); }catch(e){ return []; } }
+  function savePending(p){ try{ localStorage.setItem(LS, JSON.stringify(p)); }catch(e){} }
+  var pending = loadPending();
+
+  function allRows(){
+    var ids = {}; rows.forEach(function(r){ ids[r.id]=1; });
+    return rows.concat(pending.filter(function(p){ return !ids[p.id]; }));
+  }
+  function setStatus(){
+    $("count").textContent = allRows().length;
+    var s = $("sync"), n = pending.length;
+    s.className = "";
+    if(dbState==="config"){ s.textContent = "Η βάση δεν έχει ρυθμιστεί"; s.className="warn"; }
+    else if(n){ s.textContent = n + " περιμένουν σύνδεση"; s.className="warn"; }
+    else if(dbState==="ok"){ s.textContent = "✓ Όλα στη βάση"; }
+    else if(dbState==="off"){ s.textContent = "Χωρίς σύνδεση"; s.className="warn"; }
+    else { s.textContent = "Σύνδεση…"; }
+  }
+
+  /* ---------- interview ---------- */
+  function visible(k){ var st=STEPS[k]; return !(st.skip && st.skip(ans)); }
+  function next(){ do{ i++; }while(i<STEPS.length && !visible(i)); if(i>=STEPS.length) finish(); else render(); }
+  function prev(){ var j=i; do{ j--; }while(j>=0 && !visible(j)); if(j>=0){ i=j; render(); } }
+  function reset(){ ans={}; i=0; lastSaved=null; render(); }
+
+  function btn(text, cls, fn){
+    var b=document.createElement("button"); b.type="button"; b.className="opt"+(cls?" "+cls:""); b.textContent=text;
+    b.addEventListener("click", fn); return b;
+  }
+  function render(){
+    var st=STEPS[i], body=$("body"), opts=$("opts");
+    var shown = STEPS.filter(function(_,k){return visible(k);}), pos = shown.indexOf(st)+1;
+    $("prog").style.width = Math.round(100*(pos-1)/shown.length)+"%";
+    $("step").textContent = st.key==="_pitch" ? "Εξήγηση" : (st.key==="video" ? "Για εμάς" : "Ερώτηση "+qNumber(st));
+    $("title").textContent = typeof st.title==="function" ? st.title(ans) : st.title;
+    $("hint").textContent = st.hint||""; $("hint").hidden = !st.hint;
+    body.innerHTML=""; opts.innerHTML="";
+    if(st.type==="text"){
+      var ta=document.createElement("textarea"); ta.id="pain-text"; ta.value=ans[st.key]||""; ta.placeholder="π.χ. ψεύτικες φωτογραφίες, μεσίτες που δεν απαντάνε";
+      ta.setAttribute("aria-label","Η ατάκα του");
+      body.appendChild(ta);
+      opts.appendChild(btn("Συνέχεια","primary",function(){ ans[st.key]=ta.value.trim(); next(); }));
+    } else if(st.type==="say"){
+      var d=document.createElement("div"); d.className="say"; d.textContent=st.say; body.appendChild(d);
+      opts.appendChild(btn("Το είπα, συνέχεια","primary",next));
+    } else {
+      st.opts.forEach(function(o){
+        opts.appendChild(btn(o[1], ans[st.key]===o[0]?"on":"", function(){ ans[st.key]=o[0]; next(); }));
+      });
+    }
+    if(i===0){ opts.appendChild(btn("Δες τα αποτελέσματα ("+allRows().length+")","ghost",function(){ show("res"); })); }
+    $("back").style.visibility = i===0 ? "hidden":"visible";
+    window.scrollTo(0,0);
+  }
+  function qNumber(st){
+    var n=0; for(var k=0;k<STEPS.length;k++){ var s=STEPS[k]; if(s.key==="_pitch"||s.key==="video") continue; n++; if(s===st) return n; } return n;
+  }
+  function finish(){
+    var rec = {id:"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,7), ts:new Date().toISOString()};
+    KEYS.forEach(function(k){ if(ans[k]!==undefined && ans[k]!=="") rec[k]=ans[k]; });
+    pending.push(rec); savePending(pending); lastSaved=rec; setStatus(); flush();
+    ans={}; i=0; renderDone();
+  }
+  var lastSaved=null;
+  function renderDone(){
+    if(!lastSaved || !$("view-res").hidden) return;
+    var rec=lastSaved, n=allRows().length;
+    var stillPending = pending.some(function(p){return p.id===rec.id;});
+    var where = !stillPending ? "Αποθηκεύτηκε στην κοινή βάση."
+              : (dbState==="off"||dbState==="config") ? "Δεν υπάρχει σύνδεση τώρα. Κρατήθηκε στο κινητό και θα ανέβει μόλις βρει ίντερνετ — μην κλείσεις/σβήσεις τον browser."
+              : "Κρατήθηκε στο κινητό και ανεβαίνει τώρα…";
+    $("prog").style.width="100%"; $("step").textContent="Συνέντευξη #"+n; $("title").textContent=""; $("hint").hidden=true;
+    var h='<div class="done'+(stillPending&&dbState!=="ok"&&dbState!=="wait"?' off':'')+'"><div class="ok">✓ Καταχωρήθηκε</div><div class="where">'+esc(where)+'</div></div><div class="card" style="margin-top:12px"><ul class="recap">';
+    FIELDS.forEach(function(f){ h+='<li><span>'+esc(f[1])+'</span><span>'+esc(show1(f[0],rec[f[0]]))+'</span></li>'; });
+    h+='</ul></div>';
+    $("body").innerHTML=h; $("opts").innerHTML="";
+    $("opts").appendChild(btn("Νέα συνέντευξη","primary",function(){ reset(); }));
+    $("opts").appendChild(btn("Δες τα αποτελέσματα ("+n+")","",function(){ show("res"); }));
+    $("back").style.visibility="hidden";
+  }
+
+  /* ---------- storage: Supabase REST ---------- */
+  var configured = SUPABASE_URL.indexOf("__")!==0 && SUPABASE_KEY.indexOf("__")!==0;
+  function api(path, opt){
+    opt = opt||{};
+    var h = {"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"};
+    if(opt.prefer) h["Prefer"]=opt.prefer;
+    return fetch(SUPABASE_URL.replace(/\/$/,"")+"/rest/v1/"+path, {method:opt.method||"GET", headers:h, body:opt.body?JSON.stringify(opt.body):undefined})
+      .then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error(r.status+" "+t); }); return r.status===204?null:r.json(); });
+  }
+  var flushing=false;
+  function flush(){
+    if(!configured || flushing || !pending.length) return;
+    flushing=true;
+    var batch = pending.slice();
+    api(TABLE+"?on_conflict=id", {method:"POST", body:batch, prefer:"resolution=ignore-duplicates,return=minimal"}).then(function(){
+      var sent={}; batch.forEach(function(b){ sent[b.id]=1; });
+      batch.forEach(function(b){ if(!rows.some(function(r){return r.id===b.id;})) rows.push(b); });
+      pending = pending.filter(function(p){ return !sent[p.id]; }); savePending(pending);
+      flushing=false; dbState="ok"; setStatus();
+      if(lastSaved) renderDone();
+      if(!$("view-res").hidden) renderResults();
+      if(pending.length) flush();
+    }).catch(function(){
+      flushing=false; dbState="off"; setStatus(); if(lastSaved) renderDone();
+      setTimeout(flush, 10000);
+    });
+  }
+  var loading=false;
+  function load(){
+    if(!configured){ dbState="config"; setStatus(); return; }
+    if(loading) return; loading=true;
+    api(TABLE+"?select=*&order=ts.desc&limit=5000").then(function(data){
+      loading=false; rows = data||[]; dbState="ok"; setStatus();
+      if(!$("view-res").hidden) renderResults();
+      flush();
+    }).catch(function(){ loading=false; dbState="off"; setStatus(); });
+  }
+
+  /* ---------- results ---------- */
+  function pct(a,b){ return b? Math.round(100*a/b):0; }
+  function cnt(list,key,val){ return list.filter(function(r){return r[key]===val;}).length; }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+  function bar(label,a,b){
+    return '<div class="bar"><div class="t"><span>'+esc(label)+'</span><span>'+a+' από '+b+' · '+pct(a,b)+'%</span></div><div class="b"><i style="width:'+pct(a,b)+'%"></i></div></div>';
+  }
+  function kpi(a,b,label){
+    return '<div class="card kpi"><div class="big">'+pct(a,b)+'%</div><div class="lbl">'+esc(label)+'</div><div class="sub">'+a+' από '+b+'</div></div>';
+  }
+  function has(list,k){ return list.filter(function(r){return r[k]!==undefined && r[k]!==null && r[k]!=="";}); }
+  function renderResults(){
+    var all = allRows(), n = all.length, el=$("res");
+    if(!n){ el.innerHTML='<div class="row" style="margin-bottom:10px"><button class="opt primary" id="to-ask" type="button">‹ Πίσω στη συνέντευξη</button></div><div class="card"><h2>Καμία συνέντευξη ακόμα</h2><p class="note">Πάτα «Συνέντευξη» και ξεκίνα. Τα σύνολα γεμίζουν μόνα τους.</p></div>'; $("to-ask").addEventListener("click", function(){ show("ask"); }); return; }
+    var U=has(all,"use"), T=has(all,"trust"), A=has(all,"agent"), I=has(all,"ai");
+    var P=all.filter(function(r){return r.price==="yes"||r.price==="no";});
+    var fut=all.filter(function(r){return r.seg==="future";});
+    var h='<div class="row" style="margin-bottom:10px"><button class="opt primary" id="to-ask" type="button">‹ Πίσω στη συνέντευξη</button></div>';
+    h+='<div class="grid">'+kpi(cnt(U,"use","yes"),U.length,"θα το χρησιμοποιούσαν")+kpi(cnt(T,"trust","yes"),T.length,"εμπιστεύονται AI για το σπίτι")+'</div>';
+    h+='<div class="card" style="margin-top:10px"><h2>Για τα μεσιτικά</h2>'
+      + bar("Πήραν τηλέφωνο χωρίς να ξέρουν αν η τιμή στέκει", cnt(P,"price","no"), P.length)
+      + bar("Έχουν ήδη ρωτήσει AI για σπίτι", cnt(I,"ai","yes"), I.length)
+      + bar("Θέλουν και μεσίτη να το επιβεβαιώσει", cnt(A,"agent","yes"), A.length)
+      + '</div>';
+    h+='<div class="card" style="margin-top:10px"><h2>Ποιοι απάντησαν</h2>';
+    ["now","past","future","never"].forEach(function(s){ h+=bar(LABEL.seg[s], cnt(all,"seg",s), n); });
+    h+=bar("«Ναι» από όσους θα ψάξουν στο μέλλον", cnt(fut,"use","yes"), fut.length)+'</div>';
+    h+='<div class="card" style="margin-top:10px"><h2>Ηλικίες</h2>';
+    ["18-24","25-34","35-44","45+"].forEach(function(g){ h+=bar(g, cnt(all,"age",g), n); });
+    h+='</div>';
+    h+='<div class="card" style="margin-top:10px"><h2>«Θα το χρησιμοποιούσα» ανά ηλικία</h2>';
+    ["18-24","25-34","35-44","45+"].forEach(function(g){ var G=U.filter(function(r){return r.age===g;}); h+=bar(g, cnt(G,"use","yes"), G.length); });
+    h+='</div>';
+    var q=all.filter(function(r){return r.pain;}).sort(function(a,b){return (b.ts||"").localeCompare(a.ts||"");});
+    h+='<div class="card" style="margin-top:10px"><h2>Ατάκες ('+q.length+')</h2>';
+    if(!q.length) h+='<p class="note">Καμία ατάκα ακόμα.</p>';
+    q.forEach(function(r){ h+='<div class="quote">'+esc(r.pain)+(r.video==="yes"?'<span class="pill">REEL</span>':'')+'<small>'+esc(LABEL.seg[r.seg]||"")+(r.age?' · '+esc(r.age):'')+'</small></div>'; });
+    h+='</div>';
+    var sorted=all.slice().sort(function(a,b){return (b.ts||"").localeCompare(a.ts||"");});
+    h+='<div class="card" style="margin-top:10px"><h2>Όλες οι συνεντεύξεις ('+n+')</h2>';
+    sorted.forEach(function(r,k){
+      var t=[]; ["price","ai","use","trust","agent","video"].forEach(function(f){ var L={price:"τιμή",ai:"ρώτησε AI",use:"θα το χρησιμοποιούσε",trust:"εμπιστεύεται",agent:"θέλει μεσίτη",video:"Reel"}[f]; if(r[f]) t.push(L+": "+show1(f,r[f])); });
+      h+='<div class="entry"><b>#'+(n-k)+' · '+esc(show1("seg",r.seg))+' · '+esc(show1("age",r.age))+'</b><div class="tags">'+esc(t.join(" · "))+'</div>'+(r.pain?'<div>«'+esc(r.pain)+'»</div>':'')+'</div>';
+    });
+    h+='</div>';
+    h+='<div class="card" style="margin-top:10px"><h2>Εξαγωγή</h2><p class="note">Αντιγράφει όλες τις απαντήσεις για επικόλληση σε Excel ή Sheets.</p>'
+      +'<div class="row"><button class="opt" id="copy" type="button">Αντιγραφή πίνακα</button></div><p class="note" id="copy-msg"></p>'
+      +'<textarea id="csv" hidden readonly aria-label="Πίνακας απαντήσεων"></textarea></div>';
+    h+='<div class="card" style="margin-top:10px"><h2>Λάθος καταχώριση;</h2><p class="note">Σβήνει την πιο πρόσφατη συνέντευξη (μόνο μέσα σε 15 λεπτά από την καταχώριση).</p>'
+      +'<div class="row"><button class="opt" id="undo" type="button">Διαγραφή τελευταίας</button></div><p class="note" id="undo-msg"></p></div>';
+    el.innerHTML=h;
+    $("to-ask").addEventListener("click", function(){ show("ask"); });
+    $("copy").addEventListener("click", copyTable);
+    $("undo").addEventListener("click", undoLast);
+  }
+  function tableText(){
+    var cols=["ts","seg","pain","price","ai","use","trust","agent","age","video"];
+    var head=["Ώρα","Σπίτι","Ατάκα","Ήξερε τιμή","Ρώτησε AI","Θα το χρησιμοποιούσε","Εμπιστεύεται AI","Θέλει μεσίτη","Ηλικία","Για βίντεο"];
+    var lines=[head.join("\t")];
+    allRows().slice().sort(function(a,b){return (a.ts||"").localeCompare(b.ts||"");}).forEach(function(r){
+      lines.push(cols.map(function(c){ var v=r[c]; if(v===undefined||v===null) v=""; if(c!=="ts"&&c!=="pain"&&c!=="age") v=show1(c,v)==="—"?"":show1(c,v); return String(v).replace(/[\t\n\r]+/g," "); }).join("\t"));
+    });
+    return lines.join("\n");
+  }
+  function copyTable(){
+    var t=tableText(), msg=$("copy-msg"), box=$("csv");
+    var fallback=function(){ box.hidden=false; box.value=t; box.focus(); box.select(); msg.textContent="Δεν έγινε αυτόματα. Διάλεξε το κείμενο και κάνε αντιγραφή."; };
+    try{ navigator.clipboard.writeText(t).then(function(){ msg.textContent="Αντιγράφηκε. Κάνε επικόλληση σε Excel ή Sheets."; }, fallback); }catch(e){ fallback(); }
+  }
+  var armed=false;
+  function undoLast(){
+    var b=$("undo"), msg=$("undo-msg");
+    var all=allRows().sort(function(a,b){return (b.ts||"").localeCompare(a.ts||"");}), last=all[0];
+    if(!last) return;
+    if(!armed){ armed=true; b.textContent="Σίγουρα; Πάτα ξανά"; setTimeout(function(){ armed=false; if($("undo")) $("undo").textContent="Διαγραφή τελευταίας"; },4000); return; }
+    armed=false;
+    var wasPending = pending.some(function(p){return p.id===last.id;});
+    if(wasPending){
+      pending = pending.filter(function(p){return p.id!==last.id;}); savePending(pending);
+      setStatus(); renderResults(); return;
+    }
+    api(TABLE+"?id=eq."+encodeURIComponent(last.id), {method:"DELETE", prefer:"return=representation"}).then(function(del){
+      if(del && del.length){ rows = rows.filter(function(r){return r.id!==last.id;}); setStatus(); renderResults(); }
+      else { msg.textContent="Δεν σβήστηκε: πέρασαν πάνω από 15 λεπτά. Πες το στον Ιωάννη να τη σβήσει από τη βάση."; }
+    }, function(){ msg.textContent="Δεν σβήστηκε. Δοκίμασε ξανά όταν έχεις σύνδεση."; });
+  }
+
+  /* ---------- tabs ---------- */
+  function show(which){
+    $("view-ask").hidden = which!=="ask"; $("view-res").hidden = which!=="res";
+    $("tab-ask").setAttribute("aria-selected", which==="ask"); $("tab-res").setAttribute("aria-selected", which==="res");
+    if(which==="res"){ renderResults(); load(); } else if(lastSaved) renderDone(); else render();
+  }
+  $("tab-ask").addEventListener("click", function(){ show("ask"); });
+  $("tab-res").addEventListener("click", function(){ show("res"); });
+  $("back").addEventListener("click", prev);
+  $("cancel").addEventListener("click", reset);
+  window.addEventListener("online", function(){ flush(); load(); });
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden){ flush(); load(); } });
+  setInterval(function(){ if(!document.hidden){ if(pending.length) flush(); if(!$("view-res").hidden) load(); } }, 15000);
+
+  render(); setStatus(); load();
+})();
+</script>
+</body>
+</html>
