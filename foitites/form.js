@@ -83,8 +83,11 @@
     pending.push(rec); saveP(pending); lastId=rec.id;
     $("prog").style.width="100%"; $("step").textContent=""; $("title").textContent="Ευχαριστούμε!"; $("hint").hidden=true;
     $("body").innerHTML='<div class="done"><div class="ok">✓ Η απάντησή σου καταχωρήθηκε</div><div class="where" id="where">Αποθηκεύεται…</div></div>'
-      +'<p class="note" style="margin-top:14px">Το MeCity AI βγαίνει σύντομα. Αν σου άρεσε η ιδέα, στείλε την έρευνα σε έναν συμφοιτητή σου.</p>';
-    $("opts").innerHTML=""; $("back").style.visibility="hidden"; $("cancel").hidden=true;
+      +'<div class="end-logo"><picture><source srcset="../img/mark-white.png" media="(prefers-color-scheme: dark)"><img src="../img/mark-navy.png" alt="MeCity AI" width="26" height="24"></picture><b>MeCity <span>AI</span></b></div>'
+      +'<p class="hint" style="text-align:center;margin:0 0 4px">Το AI που σου λέει αν το σπίτι αξίζει τα λεφτά του. Έρχεται σύντομα.</p>';
+    $("opts").innerHTML='<a class="opt primary" href="https://www.instagram.com/mecity.ai/" target="_blank" rel="noopener">Κάνε follow στο Instagram · @mecity.ai</a>'
+      +'<a class="opt" href="https://www.mecity.ai/" target="_blank" rel="noopener">Δες τι φτιάχνουμε · mecity.ai</a>';
+    $("back").style.visibility="hidden"; $("cancel").hidden=true;
     flush();
   }
   var busy=false;

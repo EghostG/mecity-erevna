@@ -89,11 +89,19 @@ h2{font-size:15px;font-weight:800;margin:6px 0 0}
 
 .opt:disabled{opacity:.45;cursor:not-allowed}
 select{font:inherit;font-size:14px;font-weight:700;padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+
+.brand{display:flex;align-items:center;gap:8px}
+.brand img{display:block;height:24px;width:auto}
+.end-logo{display:flex;flex-direction:column;align-items:center;gap:8px;margin:22px 0 6px}
+.end-logo img{height:64px;width:auto;display:block}
+.end-logo b{font-size:18px;font-weight:800}
+.end-logo b span{color:var(--accent);font-weight:500}
+a.opt{text-decoration:none;display:block;text-align:center}
 </style>
 </head>
 <body>
 <div class="app">
-  <header><div class="brand">MeCity AI <span>· Έρευνα φοιτητών</span></div></header>
+  <header><div class="brand"><picture><source srcset="../img/mark-white.png" media="(prefers-color-scheme: dark)"><img src="../img/mark-navy.png" alt="MeCity AI" width="26" height="24"></picture>MeCity AI <span>· Έρευνα φοιτητών</span></div></header>
   <main class="q">
     <div class="progress"><i id="prog"></i></div>
     <div class="step" id="step"></div>
